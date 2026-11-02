@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 
 export const Route = createFileRoute("/")({
@@ -58,7 +58,8 @@ function Index() {
             <a href="#tarifs" className="hover:text-foreground">Tarifs</a>
             <a href="#faq" className="hover:text-foreground">FAQ</a>
           </nav>
-          <a href="#tarifs" className={`${btnPrimary} px-4 py-2`}>Essayer gratuitement</a>
+          <div className="flex items-center gap-4"><Link to="/auth" className="hidden sm:inline text-sm font-medium text-muted-foreground hover:text-foreground">Connexion</Link>
+          <Link to="/auth" search={{ mode: "signup" }} className={`${btnPrimary} px-4 py-2`}>Essayer gratuitement</Link></div>
         </div>
       </header>
 
@@ -72,7 +73,7 @@ function Index() {
             PayRelance suit vos factures et relance automatiquement vos clients, avec courtoisie et au bon moment.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <a href="#tarifs" className={btnPrimary}>Essayer gratuitement</a>
+            <Link to="/auth" search={{ mode: "signup" }} className={btnPrimary}>Essayer gratuitement</Link>
             <a href="#etapes" className={btnGhost}>Comment ça marche</a>
           </div>
 
@@ -134,7 +135,7 @@ function Index() {
               <ul className="mt-6 space-y-2 text-sm">
                 {p.items.map((i) => <li key={i} className="flex gap-2"><span className="text-primary">✓</span>{i}</li>)}
               </ul>
-              <a href="#" className={`mt-7 w-full ${p.highlight ? btnPrimary : btnGhost}`}>Essayer gratuitement</a>
+              <Link to="/auth" search={{ mode: "signup" }} className={`mt-7 w-full ${p.highlight ? btnPrimary : btnGhost}`}>Essayer gratuitement</Link>
             </div>
           ))}
         </div>
