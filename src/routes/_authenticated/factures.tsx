@@ -30,7 +30,7 @@ const schema = z.object({
   notes: z.string().trim().max(500),
 });
 
-export const badge: Record<InvoiceStatus, string> = {
+const badge: Record<InvoiceStatus, string> = {
   paid: "bg-primary/10 text-primary",
   pending: "bg-secondary text-foreground",
   overdue: "bg-destructive/10 text-destructive",
