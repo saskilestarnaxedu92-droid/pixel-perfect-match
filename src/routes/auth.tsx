@@ -9,8 +9,8 @@ import "@lovable.dev/cloud-auth-js/styles.css";
 type Mode = "signin" | "signup" | "forgot";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (s: Record<string, unknown>): { mode?: Mode } => ({
-    mode: s.mode === "signup" || s.mode === "forgot" ? s.mode : undefined,
+  validateSearch: (s: Record<string, unknown>): { mode?: Mode | undefined } => ({
+    mode: s["mode"] === "signup" || s["mode"] === "forgot" ? (s["mode"] as Mode) : undefined,
   }),
   head: () => ({
     meta: [
@@ -54,10 +54,10 @@ function AuthPage() {
     return () => data.subscription.unsubscribe();
   }, [navigate]);
 
-  async function onSubmit(e: FormEvent) {
+  async function onSubmit(e: FormEvent): Promise<void> {
     e.preventDefault();
     const em = emailSchema.safeParse(email);
-    if (!em.success) return toast.error(em.error.issues[0].message);
+    if (!em.success) { toast.error(em.error.issues[0]?.message ?? "Email invalide"); return; }
     setLoading(true);
     try {
       if (mode === "forgot") {
@@ -69,10 +69,10 @@ function AuthPage() {
         return;
       }
       const pw = passwordSchema.safeParse(password);
-      if (!pw.success) return toast.error(pw.error.issues[0].message);
+      if (!pw.success) { toast.error(pw.error.issues[0]?.message ?? "Mot de passe invalide"); return; }
       if (mode === "signup") {
         const name = fullName.trim().slice(0, 100);
-        if (!name) return toast.error("Indiquez votre nom");
+        if (!name) { toast.error("Indiquez votre nom"); return; }
         const { error } = await supabase.auth.signUp({
           email: em.data,
           password: pw.data,

@@ -24,11 +24,11 @@ function ResetPassword() {
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (password.length < 8) return toast.error("8 caractères minimum");
+    if (password.length < 8) { toast.error("8 caractères minimum"); return; }
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password });
     setLoading(false);
-    if (error) return toast.error("Le lien a expiré. Refaites une demande.");
+    if (error) { toast.error("Le lien a expiré. Refaites une demande."); return; }
     toast.success("Mot de passe mis à jour");
     navigate({ to: "/dashboard", replace: true });
   }
