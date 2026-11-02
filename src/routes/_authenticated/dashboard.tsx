@@ -1,6 +1,8 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { AppShell, primaryBtn } from "@/components/AppShell";
+import { eur, frDate, invoiceStatus, statusLabel } from "@/lib/invoice-status";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -20,56 +22,71 @@ const planLabel: Record<string, string> = { starter: "Starter", pro: "Pro", busi
 
 function Dashboard() {
   const { user } = Route.useRouteContext();
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { data: profile } = useQuery({
     queryKey: ["profile", user.id],
+    queryFn: async () => (await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle()).data,
+  });
+  const { data: invoices = [] } = useQuery({
+    queryKey: ["invoices"],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
+      const { data, error } = await supabase.from("invoices").select("*, clients(name)").order("due_date");
+      if (error) throw error;
       return data;
     },
   });
 
-  async function signOut() {
-    await queryClient.cancelQueries();
-    queryClient.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
-  }
-
-  const name = profile?.full_name || user.email;
+  const sum = (s: string) => invoices.filter((i) => invoiceStatus(i) === s).reduce((a, i) => a + Number(i.amount), 0);
+  const count = (s: string) => invoices.filter((i) => invoiceStatus(i) === s).length;
+  const stats = [
+    { t: "En attente", v: eur(sum("pending")), n: count("pending") },
+    { t: "En retard", v: eur(sum("overdue")), n: count("overdue") },
+    { t: "Encaissé", v: eur(sum("paid")), n: count("paid") },
+  ];
+  const upcoming = invoices.filter((i) => i.status !== "paid").slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-secondary/40">
-      <header className="border-b bg-background">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/" className="flex items-center gap-2 font-display text-lg font-bold">
-            <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground">P</span>
-            PayRelance
-          </Link>
-          <button onClick={signOut} className="rounded-full border bg-card px-4 py-2 text-sm font-medium hover:bg-secondary">
-            Déconnexion
-          </button>
+    <AppShell>
+      <h1 className="font-display text-3xl font-bold">Bonjour {profile?.full_name || user.email} 👋</h1>
+      <p className="mt-2 text-muted-foreground">
+        Offre actuelle : <span className="font-semibold text-primary">{planLabel[profile?.plan ?? "starter"]}</span>
+        {profile?.company_name ? ` · ${profile.company_name}` : ""}
+      </p>
+      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+        {stats.map((s) => (
+          <div key={s.t} className="rounded-2xl border bg-card p-6">
+            <p className="text-sm text-muted-foreground">{s.t}</p>
+            <p className="mt-2 font-display text-2xl font-bold">{s.v}</p>
+            <p className="text-xs text-muted-foreground">{s.n} facture(s)</p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-8 rounded-2xl border bg-card p-6">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-lg font-bold">À encaisser</h2>
+          <Link to="/factures" className="text-sm font-semibold text-primary">Tout voir</Link>
         </div>
-      </header>
-      <main className="mx-auto max-w-6xl px-6 py-10">
-        <h1 className="font-display text-3xl font-bold">Bonjour {name} 👋</h1>
-        <p className="mt-2 text-muted-foreground">
-          Offre actuelle : <span className="font-semibold text-primary">{planLabel[profile?.plan ?? "starter"]}</span>
-          {profile?.company_name ? ` · ${profile.company_name}` : ""}
-        </p>
-        <div className="mt-8 grid gap-4 sm:grid-cols-3">
-          {["Factures en attente", "Factures en retard", "Montant encaissé"].map((t) => (
-            <div key={t} className="rounded-2xl border bg-card p-6">
-              <p className="text-sm text-muted-foreground">{t}</p>
-              <p className="mt-2 font-display text-2xl font-bold">—</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-8 rounded-2xl border border-dashed bg-card p-8 text-center text-muted-foreground">
-          Vos clients et factures apparaîtront ici très bientôt.
-        </div>
-      </main>
-    </div>
+        {upcoming.length === 0 ? (
+          <div className="py-8 text-center text-muted-foreground">
+            <p>Aucune facture en attente.</p>
+            <Link to="/factures" className={`${primaryBtn} mt-4`}>Créer une facture</Link>
+          </div>
+        ) : (
+          <ul className="mt-4 divide-y">
+            {upcoming.map((i) => {
+              const s = invoiceStatus(i);
+              return (
+                <li key={i.id} className="flex items-center justify-between gap-3 py-3 text-sm">
+                  <span><span className="font-semibold">{i.clients?.name}</span> · {i.number}</span>
+                  <span className="text-right">
+                    {eur(Number(i.amount))}
+                    <span className={`ml-2 text-xs ${s === "overdue" ? "text-destructive" : "text-muted-foreground"}`}>{statusLabel[s]} · {frDate(i.due_date)}</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    </AppShell>
   );
 }
