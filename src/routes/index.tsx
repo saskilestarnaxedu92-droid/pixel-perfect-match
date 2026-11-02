@@ -58,8 +58,8 @@ function Index() {
             <a href="#tarifs" className="hover:text-foreground">Tarifs</a>
             <a href="#faq" className="hover:text-foreground">FAQ</a>
           </nav>
-          <Link to="/auth" className="text-sm font-medium text-muted-foreground hover:text-foreground">Connexion</Link>
-          <Link to="/auth" search={{ mode: "signup" }} className={`${btnPrimary} px-4 py-2`}>Essayer gratuitement</Link>
+          <div className="flex items-center gap-4"><Link to="/auth" className="hidden sm:inline text-sm font-medium text-muted-foreground hover:text-foreground">Connexion</Link>
+          <Link to="/auth" search={{ mode: "signup" }} className={`${btnPrimary} px-4 py-2`}>Essayer gratuitement</Link></div>
         </div>
       </header>
 
