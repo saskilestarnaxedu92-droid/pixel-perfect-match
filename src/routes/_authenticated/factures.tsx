@@ -56,7 +56,7 @@ function InvoicesPage() {
     queryFn: async () => (await supabase.from("profiles").select("plan").eq("id", user.id).maybeSingle()).data?.plan ?? "starter",
   });
   const { data: invoices = [], isLoading } = useQuery({
-    queryKey: ["invoices"],
+    queryKey: ["invoices", "with-reminder-recipient"],
     queryFn: async () => {
       const { data, error } = await supabase.from("invoices").select("*, clients(name, email)").order("due_date");
       if (error) throw error;
