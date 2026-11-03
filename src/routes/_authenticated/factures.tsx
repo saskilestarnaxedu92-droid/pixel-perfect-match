@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell, fieldClass, ghostBtn, primaryBtn } from "@/components/AppShell";
 import { eur, frDate, invoiceStatus, statusLabel, PLAN_LIMITS, type InvoiceStatus } from "@/lib/invoice-status";
+import { InvoiceReminders } from "@/components/InvoiceReminders";
 
 export const Route = createFileRoute("/_authenticated/factures")({
   head: () => ({
@@ -57,7 +58,7 @@ function InvoicesPage() {
   const { data: invoices = [], isLoading } = useQuery({
     queryKey: ["invoices"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("invoices").select("*, clients(name)").order("due_date");
+      const { data, error } = await supabase.from("invoices").select("*, clients(name, email)").order("due_date");
       if (error) throw error;
       return data;
     },
@@ -165,7 +166,8 @@ function InvoicesPage() {
         ) : rows.map((i) => {
           const s = invoiceStatus(i);
           return (
-            <div key={i.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card p-5">
+            <div key={i.id} className="rounded-2xl border bg-card p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="font-semibold">{i.number} · {i.clients?.name}</p>
                 <p className="text-sm text-muted-foreground">Échéance le {frDate(i.due_date)}</p>
@@ -178,6 +180,8 @@ function InvoicesPage() {
                 </button>
                 <button className={ghostBtn} onClick={() => { if (confirm("Supprimer cette facture ?")) remove.mutate(i.id); }}>Supprimer</button>
               </div>
+              </div>
+              <InvoiceReminders invoice={{ number: i.number, amount: Number(i.amount), due_date: i.due_date, status: i.status }} clientName={i.clients?.name ?? ""} recipient={i.clients?.email ?? null} />
             </div>
           );
         })}
