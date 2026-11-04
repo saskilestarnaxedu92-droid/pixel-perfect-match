@@ -16,6 +16,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedClientsRouteImport } from './routes/_authenticated/clients'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedFacturesRouteImport } from './routes/_authenticated/factures'
+import { Route as AuthenticatedOffresRouteImport } from './routes/_authenticated/offres'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -51,6 +52,11 @@ const AuthenticatedFacturesRoute = AuthenticatedFacturesRouteImport.update({
   path: '/factures',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOffresRoute = AuthenticatedOffresRouteImport.update({
+  id: '/offres',
+  path: '/offres',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/clients': typeof AuthenticatedClientsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/factures': typeof AuthenticatedFacturesRoute
+  '/offres': typeof AuthenticatedOffresRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/clients': typeof AuthenticatedClientsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/factures': typeof AuthenticatedFacturesRoute
+  '/offres': typeof AuthenticatedOffresRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,14 +85,27 @@ export interface FileRoutesById {
   '/_authenticated/clients': typeof AuthenticatedClientsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/factures': typeof AuthenticatedFacturesRoute
+  '/_authenticated/offres': typeof AuthenticatedOffresRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/reset-password' | '/clients' | '/dashboard' | '/factures'
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/clients'
+    | '/dashboard'
+    | '/factures'
+    | '/offres'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/auth' | '/reset-password' | '/clients' | '/dashboard' | '/factures'
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/clients'
+    | '/dashboard'
+    | '/factures'
+    | '/offres'
   id:
     | '__root__'
     | '/'
@@ -94,6 +115,7 @@ export interface FileRouteTypes {
     | '/_authenticated/clients'
     | '/_authenticated/dashboard'
     | '/_authenticated/factures'
+    | '/_authenticated/offres'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -154,6 +176,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFacturesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/offres': {
+      id: '/_authenticated/offres'
+      path: '/offres'
+      fullPath: '/offres'
+      preLoaderRoute: typeof AuthenticatedOffresRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -161,12 +190,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedClientsRoute: typeof AuthenticatedClientsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFacturesRoute: typeof AuthenticatedFacturesRoute
+  AuthenticatedOffresRoute: typeof AuthenticatedOffresRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedClientsRoute: AuthenticatedClientsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFacturesRoute: AuthenticatedFacturesRoute,
+  AuthenticatedOffresRoute: AuthenticatedOffresRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

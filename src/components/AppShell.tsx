@@ -7,6 +7,7 @@ const nav = [
   { to: "/dashboard", label: "Tableau de bord" },
   { to: "/factures", label: "Factures" },
   { to: "/clients", label: "Clients" },
+  { to: "/offres", label: "Offres" },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {

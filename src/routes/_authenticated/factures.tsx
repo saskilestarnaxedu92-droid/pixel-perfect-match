@@ -126,7 +126,7 @@ function InvoicesPage() {
       </div>
 
       {atLimit && (
-        <p className="mt-4 rounded-xl bg-primary/10 p-4 text-sm">Vous avez atteint la limite de {limit} factures de votre offre. <Link to="/" hash="tarifs" className="font-semibold text-primary">Voir les offres</Link></p>
+        <p className="mt-4 rounded-xl bg-primary/10 p-4 text-sm">Vous avez atteint la limite de {limit} factures de votre offre. <Link to="/offres" className="font-semibold text-primary">Voir les offres</Link></p>
       )}
 
       {open && (
