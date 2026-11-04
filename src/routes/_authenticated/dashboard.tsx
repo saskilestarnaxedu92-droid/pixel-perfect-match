@@ -51,6 +51,12 @@ function Dashboard() {
         Offre actuelle : <span className="font-semibold text-primary">{planLabel[profile?.plan ?? "starter"]}</span>
         {profile?.company_name ? ` · ${profile.company_name}` : ""}
       </p>
+      {(profile?.plan ?? "starter") === "starter" && (
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card p-5">
+          <p className="text-sm">Besoin de plus de 5 factures ? Passez à l'offre Pro ou Business.</p>
+          <Link to="/offres" className={primaryBtn}>Découvrir les offres</Link>
+        </div>
+      )}
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
         {stats.map((s) => (
           <div key={s.t} className="rounded-2xl border bg-card p-6">
