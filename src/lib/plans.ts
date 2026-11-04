@@ -1,5 +1,5 @@
-/** Lien PayPal.me du vendeur — à renseigner avec le vrai lien (ex. "https://paypal.me/votrepseudo"). */
-export const PAYPAL_ME_LINK = "";
+/** Lien PayPal.me du vendeur. */
+export const PAYPAL_ME_LINK = "https://paypal.me/DoucoureMohamed696";
 
 export type PlanId = "starter" | "pro" | "business";
 
