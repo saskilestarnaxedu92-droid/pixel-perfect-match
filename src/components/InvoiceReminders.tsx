@@ -8,10 +8,12 @@ type Props = {
   invoice: { number: string; amount: number; due_date: string; status: string };
   clientName: string;
   recipient: string | null;
+  defaultOpen?: boolean;
+  demo?: boolean;
 };
 
-export function InvoiceReminders({ invoice, clientName, recipient }: Props) {
-  const [open, setOpen] = useState(false);
+export function InvoiceReminders({ invoice, clientName, recipient, defaultOpen = false, demo = false }: Props) {
+  const [open, setOpen] = useState(defaultOpen);
   const [offset, setOffset] = useState<ReminderOffset>(-3);
   const message = reminderMessage({ ...invoice, clientName }, offset);
   const paid = invoice.status === "paid";
@@ -24,7 +26,7 @@ export function InvoiceReminders({ invoice, clientName, recipient }: Props) {
       {open && (
         <div className="mt-3 space-y-4">
           <p className={`text-sm ${paid ? "text-success" : "text-muted-foreground"}`}>
-            {paid ? "Facture payée · aucune relance à envoyer." : "Envoi automatique non activé · aucun email envoyé."}
+            {paid ? "Facture payée · aucune relance à envoyer." : demo ? "Relances automatiques programmées · 5 étapes" : "Envoi automatique non activé · aucun email envoyé."}
           </p>
           <div className="flex flex-wrap gap-2" role="group" aria-label={`Étapes de relance de ${invoice.number}`}>
             {reminderDates(invoice.due_date).map((stage) => (
